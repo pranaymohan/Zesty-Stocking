@@ -3,7 +3,7 @@ var Sequelize = require('sequelize');
 
 var options = {
   dialect: 'mariadb',
-  logging: true
+  pool: false
 };
 
 if (process.env.JAWSDB_MARIA_URL) {
@@ -11,16 +11,16 @@ if (process.env.JAWSDB_MARIA_URL) {
   var db = new Sequelize(process.env.JAWSDB_MARIA_URL, options);
 } else {
   // app is running on local
-  var db = new Sequelize('zestydb', 'root', 'root', options);  
+  var db = new Sequelize('zestydb', 'root', 'root', options);
 }
 
 // DEFINE MODELS =================================
-
 var User = db.define('User', {
-  username: Sequelize.STRING,
-  name: Sequelize.STRING,
-  location: Sequelize.STRING,
-  avatarUrl: Sequelize.STRING
+  username: { type: Sequelize.STRING, allowNull: false },
+  name: { type: Sequelize.STRING, defaultValue: null },
+  location: { type: Sequelize.STRING, defaultValue: null },
+  avatarUrl:  { type: Sequelize.STRING, defaultValue: null },
+  accessToken: Sequelize.STRING
   /*
   followers: ,
   following: ,
@@ -30,14 +30,14 @@ var User = db.define('User', {
   starred: ,
   organizations: ,
   gists: ,
-  company: 
+  company:
    */
 
 });
 
 var Message = db.define('Message', { // user-facing name: 'byte'
-  text: Sequelize.STRING,
-  likes: Sequelize.INTEGER // user-facing name: 'groks'
+  text: { type: Sequelize.STRING, defaultValue: null },
+  likes: { type: Sequelize.INTEGER, defaultValue: 0 } // user-facing name: 'groks'
   /*
   media: // images, repos, links, mentions
    */
@@ -45,6 +45,7 @@ var Message = db.define('Message', { // user-facing name: 'byte'
 
 Message.belongsTo(User);
 User.hasMany(Message);
+
 
 // create tables if they don't already exist
 User.sync(
@@ -56,6 +57,3 @@ Message.sync(
 
 exports.User = User;
 exports.Message = Message;
-
-
-
